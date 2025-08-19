@@ -1,7 +1,7 @@
 {
-  "name": "toneya-analysis-v1-frontend",
+  "name": "site-scan-v1-frontend",
   "version": "1.1.0",
-  "description": "Toneya Analysis V1 - 高機能ウェブサイト分析ツールのフロントエンド",
+  "description": "Site Scan V1 - 高機能ウェブサイト分析ツールのフロントエンド",
   "private": true,
   "dependencies": {
     "@heroicons/react": "^2.0.18",

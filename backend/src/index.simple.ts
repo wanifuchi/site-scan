@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Toneya Analysis V1 API is running',
+    message: 'Site Scan V1 API is running',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });

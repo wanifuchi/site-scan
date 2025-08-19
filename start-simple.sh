@@ -2,7 +2,7 @@
 
 # 簡単な起動スクリプト
 
-echo "Toneya Analysis V1（簡易版）を起動します..."
+echo "Site Scan V1（簡易版）を起動します..."
 
 # 必要なディレクトリを作成
 mkdir -p backend/logs
@@ -23,7 +23,7 @@ cd ..
 
 echo ""
 echo "==============================================="
-echo "Toneya Analysis V1（簡易版）が起動しました！"
+echo "Site Scan V1（簡易版）が起動しました！"
 echo ""
 echo "フロントエンド: http://localhost:3000"
 echo "バックエンドAPI: http://localhost:3001"

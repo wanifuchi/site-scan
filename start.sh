@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Toneya Analysis V1起動スクリプト
+# Site Scan V1起動スクリプト
 
-echo "Toneya Analysis V1を起動します..."
+echo "Site Scan V1を起動します..."
 
 # Docker Composeでサービスを起動
 echo "Dockerサービスを起動中..."
@@ -44,7 +44,7 @@ cd ..
 
 echo ""
 echo "==============================================="
-echo "Toneya Analysis V1が起動しました！"
+echo "Site Scan V1が起動しました！"
 echo ""
 echo "フロントエンド: http://localhost:3000"
 echo "バックエンドAPI: http://localhost:3001"

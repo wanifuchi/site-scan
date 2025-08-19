@@ -100,11 +100,11 @@ const AboutPage: React.FC = () => {
           
           <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-none tracking-tight">
             <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Toneya
+              Site Scan
             </span>
             <br />
             <span className="bg-gradient-to-r from-slate-200 via-slate-300 to-slate-400 bg-clip-text text-transparent">
-              Website Analyzer
+              V1
             </span>
           </h1>
           
@@ -327,7 +327,7 @@ const AboutPage: React.FC = () => {
                   未来のウェブ解析を今すぐ体験
                 </h2>
                 <p className="text-slate-300 max-w-2xl mx-auto leading-relaxed">
-                  Toneya Website Analyzerで、あなたのウェブサイトの真の可能性を発見してください。
+                  Site Scan V1で、あなたのウェブサイトの真の可能性を発見してください。
                   AI駆動の包括的分析が、新たなデジタル体験の扉を開きます。
                 </p>
                 <div className="flex justify-center space-x-4 pt-4">

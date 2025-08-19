@@ -2,7 +2,7 @@
 
 ## 概要
 
-Toneya Analysis V1は、分析データの永続化のためにPostgreSQLデータベースを統合しています。
+Site Scan V1は、分析データの永続化のためにPostgreSQLデータベースを統合しています。
 データベースが利用できない場合は、自動的にメモリ内ストレージにフォールバックします。
 
 ## 機能
@@ -160,7 +160,7 @@ GET /api/health
 ```json
 {
   "success": true,
-  "message": "Toneya Analysis V1 API is running",
+  "message": "Site Scan V1 API is running",
   "timestamp": "2024-01-15T10:30:00Z",
   "version": "1.0.0",
   "database": {
@@ -266,4 +266,4 @@ tail -f /var/log/postgresql/postgresql-*.log
 
 ---
 
-このPostgreSQL統合により、Toneya Analysis V1はより堅牢なデータ管理と高度な分析履歴機能を提供します。
+このPostgreSQL統合により、Site Scan V1はより堅牢なデータ管理と高度な分析履歴機能を提供します。

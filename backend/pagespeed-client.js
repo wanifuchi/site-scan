@@ -61,7 +61,7 @@ class PageSpeedInsightsClient {
         params,
         timeout: this.timeout,
         headers: {
-          'User-Agent': 'Toneya-Analysis-V1/1.0'
+          'User-Agent': 'Site-Scan-V1/1.0'
         }
       });
 

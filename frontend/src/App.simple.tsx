@@ -17,10 +17,10 @@ function App() {
                 <Link to="/" className="flex items-center space-x-3 group">
                   <div className="relative w-10 h-10 bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-all duration-300 shadow-lg group-hover:shadow-xl">
                     <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-                    <span className="relative z-10">T</span>
+                    <span className="relative z-10">S</span>
                   </div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 via-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-                    Toneya Website Analyzer
+                    Site Scan V1
                   </h1>
                 </Link>
               </div>
@@ -68,10 +68,10 @@ function App() {
               <div className="flex justify-center items-center space-x-4 mb-6">
                 <div className="relative w-8 h-8 bg-gradient-to-br from-cyan-500 via-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
                   <div className="absolute inset-0 bg-gradient-to-br from-cyan-400 to-purple-500 rounded-lg opacity-20"></div>
-                  <span className="relative z-10">T</span>
+                  <span className="relative z-10">S</span>
                 </div>
                 <span className="font-semibold text-lg bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent">
-                  Toneya Website Analyzer
+                  Site Scan V1
                 </span>
               </div>
               <p className="text-slate-400 mb-4 max-w-md mx-auto leading-relaxed">

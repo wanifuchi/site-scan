@@ -562,7 +562,7 @@ app.use(express.urlencoded({
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Toneya Analysis V1 API is running',
+    message: 'Site Scan V1 API is running',
     timestamp: new Date().toISOString(),
     version: '1.0.1',
     database: {

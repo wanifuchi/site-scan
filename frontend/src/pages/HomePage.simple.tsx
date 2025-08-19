@@ -90,11 +90,11 @@ const HomePage: React.FC = () => {
             
             <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-none tracking-tight">
               <span className="bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Toneya
+                Site Scan
               </span>
               <br />
               <span className="bg-gradient-to-r from-slate-200 via-slate-300 to-slate-400 bg-clip-text text-transparent">
-                Website Analyzer
+                V1
               </span>
             </h1>
             
