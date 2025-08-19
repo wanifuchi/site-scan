@@ -5,6 +5,7 @@ import { getCoreWebVitalEvaluation, getColorClasses } from '../utils/coreWebVita
 import MetricCard from '../components/MetricCard';
 import RecommendationChatbot from '../components/RecommendationChatbot';
 import html2canvas from 'html2canvas';
+import { localHistoryService } from '../services/LocalHistoryService';
 
 interface AnalysisProgress {
   currentStep: string;
@@ -48,6 +49,18 @@ const AnalysisPage: React.FC = () => {
             setStatus('completed');
             setProgress(null); // 完了時は進捗をクリア
             
+            // ローカル履歴を更新（完了状態と結果を保存）
+            localHistoryService.saveAnalysis({
+              id: data.data.id,
+              url: data.data.url,
+              status: 'completed',
+              startedAt: data.data.startedAt,
+              analyzedAt: new Date().toISOString(),
+              score: data.data.results?.overall?.score,
+              results: data.data.results
+            });
+            console.log('📁 ローカル履歴を更新（完了）:', data.data.id);
+            
             // PageSpeedデータが欠落している場合は補完取得
             if (data.data.results && !data.data.results.pageSpeed && data.data.url) {
               console.log('⚠️ PageSpeedデータが欠落しています。補完取得を開始...');
@@ -58,9 +71,32 @@ const AnalysisPage: React.FC = () => {
             if (data.data.results) {
               setStatus('completed');
               setProgress(null);
+              
+              // ローカル履歴を更新（部分完了状態）
+              localHistoryService.saveAnalysis({
+                id: data.data.id,
+                url: data.data.url,
+                status: 'completed',
+                startedAt: data.data.startedAt,
+                analyzedAt: new Date().toISOString(),
+                score: data.data.results?.overall?.score,
+                results: data.data.results
+              });
+              console.log('📁 ローカル履歴を更新（部分完了）:', data.data.id);
             } else {
               setStatus('error');
               setProgress(null);
+              
+              // ローカル履歴を更新（エラー状態）
+              localHistoryService.saveAnalysis({
+                id: data.data.id,
+                url: data.data.url,
+                status: 'error',
+                startedAt: data.data.startedAt,
+                analyzedAt: new Date().toISOString(),
+                results: null
+              });
+              console.log('📁 ローカル履歴を更新（エラー）:', data.data.id);
             }
           } else {
             // まだ処理中の場合は2秒後に再チェック（より頻繁に進捗をチェック）
@@ -132,6 +168,18 @@ const AnalysisPage: React.FC = () => {
         };
         setAnalysisData(mockAnalysis);
         setStatus('completed');
+        
+        // ローカル履歴を更新（モックデータ）
+        localHistoryService.saveAnalysis({
+          id: mockAnalysis.id,
+          url: mockAnalysis.url,
+          status: 'completed',
+          startedAt: mockAnalysis.startedAt,
+          analyzedAt: mockAnalysis.completedAt,
+          score: mockAnalysis.results?.overall?.score,
+          results: mockAnalysis.results
+        });
+        console.log('📁 ローカル履歴を更新（モック）:', mockAnalysis.id);
       }
     };
     
