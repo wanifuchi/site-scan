@@ -47,6 +47,30 @@ function requireAdminAuth(req, res, next) {
   next();
 }
 
+// ユーティリティ関数: 安全なタイトル抽出
+function extractMainTitle(title) {
+  if (!title) return '';
+  
+  const separators = ['|', '｜', '-', '－', '–', '—', ' - ', ' | ', ' ｜ '];
+  let result = title;
+  let minIndex = result.length;
+  
+  // 最初に見つかる区切り文字の位置を特定
+  for (const sep of separators) {
+    const index = result.indexOf(sep);
+    if (index !== -1 && index < minIndex) {
+      minIndex = index;
+    }
+  }
+  
+  // 区切り文字が見つかった場合、その前までを取得
+  if (minIndex < result.length) {
+    result = result.substring(0, minIndex);
+  }
+  
+  return result.trim();
+}
+
 // データベース利用可能かチェック
 let isDatabaseConnected = false;
 
@@ -385,7 +409,7 @@ async function generateAIRecommendations(url, analysisResults) {
           
           if (tempContent.title) {
             // メインタイトルの追加
-            const mainTitle = tempContent.title.replace(/[|｜\-\s].*/g, '').trim();
+            const mainTitle = extractMainTitle(tempContent.title);
             if (mainTitle && mainTitle.length > 2) keywords.push(mainTitle);
             
             // サイト名を含む完全なタイトル
