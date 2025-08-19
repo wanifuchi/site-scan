@@ -2198,8 +2198,8 @@ const AnalysisPage: React.FC = () => {
                 </div>
               )}
 
-              {/* SERP分析 */}
-              {aiRecommendations.serpAnalysis && (
+              {/* SERP分析 - 一時的に無効化（出力結果改善中） */}
+              {/* {aiRecommendations.serpAnalysis && (
                 <div className="bg-gradient-to-r from-rose-100 to-pink-100 rounded-xl p-6 border border-rose-300">
                   <h4 className="font-bold text-rose-900 mb-4 flex items-center">
                     <span className="mr-2">🔍</span>
@@ -2207,7 +2207,7 @@ const AnalysisPage: React.FC = () => {
                   </h4>
                   
                   {/* サマリー情報 */}
-                  {aiRecommendations.serpAnalysis.summary && (
+                  {/* {aiRecommendations.serpAnalysis.summary && (
                     <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="bg-white p-4 rounded-lg border border-rose-200">
                         <div className="text-sm text-gray-600">平均順位</div>
@@ -2230,10 +2230,10 @@ const AnalysisPage: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                  )}
+                  )} */}
                   
                   {/* SERP特徴 */}
-                  {aiRecommendations.serpAnalysis.summary?.serpFeatures && Object.keys(aiRecommendations.serpAnalysis.summary.serpFeatures).length > 0 && (
+                  {/* {aiRecommendations.serpAnalysis.summary?.serpFeatures && Object.keys(aiRecommendations.serpAnalysis.summary.serpFeatures).length > 0 && (
                     <div className="mb-6">
                       <h5 className="font-semibold text-rose-800 mb-3">🎯 検出されたSERP特徴</h5>
                       <div className="flex flex-wrap gap-2">
@@ -2244,10 +2244,10 @@ const AnalysisPage: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                  )}
+                  )} */}
                   
                   {/* 改善機会 */}
-                  {aiRecommendations.serpAnalysis.summary?.topOpportunities && aiRecommendations.serpAnalysis.summary.topOpportunities.length > 0 && (
+                  {/* {aiRecommendations.serpAnalysis.summary?.topOpportunities && aiRecommendations.serpAnalysis.summary.topOpportunities.length > 0 && (
                     <div className="mb-6">
                       <h5 className="font-semibold text-rose-800 mb-3">💡 改善機会</h5>
                       <div className="space-y-3">
@@ -2263,10 +2263,10 @@ const AnalysisPage: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                  )}
+                  )} */}
                   
                   {/* SERP改善提案 */}
-                  {aiRecommendations.serpAnalysis.recommendations && aiRecommendations.serpAnalysis.recommendations.length > 0 && (
+                  {/* {aiRecommendations.serpAnalysis.recommendations && aiRecommendations.serpAnalysis.recommendations.length > 0 && (
                     <div>
                       <h5 className="font-semibold text-rose-800 mb-3">📋 SERP改善提案</h5>
                       <div className="space-y-4">
@@ -2288,9 +2288,9 @@ const AnalysisPage: React.FC = () => {
                         ))}
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
+                  )} */}
+                {/* </div>
+              )} */}
 
               {/* 実装ロードマップ */}
               {aiRecommendations.implementationRoadmap && (
