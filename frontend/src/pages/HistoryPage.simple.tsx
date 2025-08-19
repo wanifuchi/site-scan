@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import html2canvas from 'html2canvas';
+import { useAuth, useAdminAuth } from '../contexts/AuthContext';
+import { localHistoryService, LocalAnalysis } from '../services/LocalHistoryService';
 
 interface SimpleAnalysis {
   id: string;
@@ -14,68 +16,93 @@ const HistoryPageSimple: React.FC = () => {
   const [analyses, setAnalyses] = useState<SimpleAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'local' | 'admin'>('local');
+  
+  const { authState, logout } = useAuth();
+  const { isAdmin, getAuthHeaders } = useAdminAuth();
 
   useEffect(() => {
     loadHistory();
-  }, []);
+  }, [viewMode, isAdmin]);
+
+  // 管理者認証状態が変更された時に表示モードを切り替え
+  useEffect(() => {
+    if (isAdmin) {
+      setViewMode('admin');
+    } else {
+      setViewMode('local');
+    }
+  }, [isAdmin]);
 
   const loadHistory = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('履歴取得開始...');
-      
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://site-scan-production.up.railway.app';
-      console.log('API Base URL:', API_BASE_URL);
-      
-      const response = await fetch(`${API_BASE_URL}/api/analysis/history?page=1&limit=20`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      console.log('API Response status:', response.status);
-      console.log('API Response headers:', response.headers);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      console.log('API Response data:', data);
-      
-      if (data.success && data.data && data.data.analyses) {
-        setAnalyses(data.data.analyses);
-      } else if (data.success && data.analyses) {
-        // フォールバック: 古いAPIレスポンス形式に対応
-        setAnalyses(data.analyses);
+      if (viewMode === 'local') {
+        // ローカルストレージから履歴を読み込み
+        console.log('📁 ローカル履歴を読み込み...');
+        const localHistory = localHistoryService.getHistory();
+        
+        // LocalAnalysisをSimpleAnalysisに変換
+        const convertedHistory: SimpleAnalysis[] = localHistory.map(item => ({
+          id: item.id,
+          url: item.url,
+          status: item.status,
+          startedAt: item.startedAt,
+          score: item.score
+        }));
+        
+        setAnalyses(convertedHistory);
+        console.log(`📊 ローカル履歴 ${convertedHistory.length}件を読み込み完了`);
       } else {
-        setAnalyses([]);
+        // 管理者用: APIから全履歴を取得
+        console.log('🔐 管理者履歴を取得...');
+        
+        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://site-scan-production.up.railway.app';
+        console.log('API Base URL:', API_BASE_URL);
+        
+        const response = await fetch(`${API_BASE_URL}/api/analysis/history?page=1&limit=20`, {
+          method: 'GET',
+          headers: getAuthHeaders(),
+        });
+        
+        console.log('API Response status:', response.status);
+        
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error('認証が必要です。ログインしてください。');
+          }
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log('API Response data:', data);
+        
+        if (data.success && data.data && data.data.analyses) {
+          setAnalyses(data.data.analyses);
+        } else if (data.success && data.analyses) {
+          setAnalyses(data.analyses);
+        } else {
+          setAnalyses([]);
+        }
       }
       
     } catch (err: any) {
       console.error('履歴取得エラー:', err);
       setError(err.message || '履歴の取得に失敗しました');
       
-      // フォールバック: サンプルデータを表示
-      setAnalyses([
-        {
-          id: 'sample-1',
-          url: 'https://example.com',
-          status: 'completed',
-          startedAt: new Date().toISOString(),
-          score: 85
-        },
-        {
-          id: 'sample-2',
-          url: 'https://google.com',
-          status: 'completed',
-          startedAt: new Date(Date.now() - 86400000).toISOString(),
-          score: 92
+      if (viewMode === 'local') {
+        // ローカルモードの場合は空配列
+        setAnalyses([]);
+      } else {
+        // 管理者モードで認証エラーの場合はローカルモードに切り替え
+        if (err.message?.includes('認証')) {
+          setViewMode('local');
+          return; // loadHistoryが再実行される
         }
-      ]);
+        setAnalyses([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -167,11 +194,72 @@ const HistoryPageSimple: React.FC = () => {
       {/* ヘッダー */}
       <div className="bg-slate-900/80 backdrop-blur-xl shadow-xl border-b border-slate-700/50">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-              分析履歴
-            </h1>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                分析履歴
+              </h1>
+              <div className="flex items-center space-x-4">
+                {/* 表示モード切り替え */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-slate-400">表示モード:</span>
+                  <div className="flex bg-slate-800/50 rounded-lg p-1">
+                    <button
+                      onClick={() => setViewMode('local')}
+                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                        viewMode === 'local'
+                          ? 'bg-cyan-600 text-white shadow-lg'
+                          : 'text-slate-400 hover:text-slate-300'
+                      }`}
+                    >
+                      📱 ローカル履歴
+                    </button>
+                    <button
+                      onClick={() => isAdmin ? setViewMode('admin') : null}
+                      disabled={!isAdmin}
+                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
+                        viewMode === 'admin' && isAdmin
+                          ? 'bg-purple-600 text-white shadow-lg'
+                          : isAdmin 
+                          ? 'text-slate-400 hover:text-slate-300'
+                          : 'text-slate-600 cursor-not-allowed'
+                      }`}
+                      title={!isAdmin ? '管理者ログインが必要です' : ''}
+                    >
+                      🔐 管理者履歴
+                    </button>
+                  </div>
+                </div>
+
+                {/* 認証状態表示 */}
+                {isAdmin && (
+                  <div className="flex items-center space-x-2 text-xs">
+                    <span className="px-2 py-1 bg-green-900/30 text-green-400 rounded-md border border-green-500/30">
+                      👑 管理者でログイン中
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
             <div className="flex gap-3">
+              {/* 認証関連ボタン */}
+              {isAdmin ? (
+                <button
+                  onClick={logout}
+                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-xl hover:from-red-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-red-500/25 font-medium text-sm"
+                >
+                  ログアウト
+                </button>
+              ) : (
+                <Link
+                  to="/admin"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium text-sm"
+                >
+                  管理者ログイン
+                </Link>
+              )}
+              
               <button
                 onClick={handleScreenshot}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-purple-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium"
@@ -193,7 +281,31 @@ const HistoryPageSimple: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         {error && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-xl text-red-300">
-            エラー: {error} (フォールバックデータを表示中)
+            <div className="flex items-center space-x-2 mb-2">
+              <span className="text-red-400">⚠️</span>
+              <span className="font-medium">
+                {viewMode === 'admin' ? '管理者履歴取得エラー' : 'ローカル履歴エラー'}
+              </span>
+            </div>
+            <p className="text-sm">{error}</p>
+            {viewMode === 'admin' && error.includes('認証') && (
+              <div className="mt-3 pt-3 border-t border-red-500/30">
+                <p className="text-xs text-red-200">
+                  認証が切れている可能性があります。
+                  <Link to="/admin" className="text-cyan-400 hover:text-cyan-300 ml-1">
+                    再ログイン
+                  </Link>
+                  するか、
+                  <button 
+                    onClick={() => setViewMode('local')} 
+                    className="text-cyan-400 hover:text-cyan-300 ml-1"
+                  >
+                    ローカル履歴
+                  </button>
+                  をご確認ください。
+                </p>
+              </div>
+            )}
           </div>
         )}
 
@@ -203,10 +315,13 @@ const HistoryPageSimple: React.FC = () => {
               <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">📊</span>
             </div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent mb-3">
-              まだ分析履歴がありません
+              {viewMode === 'local' ? 'ローカル履歴がありません' : '管理者履歴がありません'}
             </h2>
             <p className="text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-              ウェブサイトの分析を開始して、パフォーマンス、セキュリティ、アクセシビリティを解析しましょう
+              {viewMode === 'local' 
+                ? 'ブラウザで分析を実行すると、結果がここに保存されます。管理者権限をお持ちの場合は、管理者ログインで全履歴をご確認いただけます。'
+                : 'データベースに保存された分析履歴がありません。新しい分析を開始してください。'
+              }
             </p>
             <Link 
               to="/" 

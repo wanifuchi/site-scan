@@ -3,9 +3,28 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
+import crypto from 'crypto';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// 認証関連
+const adminTokens = new Set<string>(); // 管理者トークン管理
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'sitescan_admin_2025';
+
+// 認証ミドルウェア
+const requireAdminAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token || !adminTokens.has(token)) {
+    return res.status(401).json({
+      success: false,
+      error: '管理者認証が必要です'
+    });
+  }
+  
+  next();
+};
 
 app.use(helmet());
 app.use(cors({
@@ -62,8 +81,47 @@ app.post('/api/analysis/start', (req, res) => {
   });
 });
 
-// 分析履歴のモック
-app.get('/api/analysis/history', (req, res) => {
+// 管理者ログイン
+app.post('/api/auth/admin', (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!password || password !== ADMIN_PASSWORD) {
+      return res.status(401).json({
+        success: false,
+        error: 'パスワードが正しくありません'
+      });
+    }
+    
+    // トークン生成
+    const token = crypto.randomBytes(32).toString('hex');
+    adminTokens.add(token);
+    
+    // トークンの有効期限設定（24時間）
+    setTimeout(() => {
+      adminTokens.delete(token);
+    }, 24 * 60 * 60 * 1000);
+    
+    res.json({
+      success: true,
+      data: {
+        token,
+        expiresIn: '24h',
+        message: '管理者として認証されました'
+      }
+    });
+    
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'ログイン処理に失敗しました'
+    });
+  }
+});
+
+// 分析履歴（管理者限定）
+app.get('/api/analysis/history', requireAdminAuth, (req, res) => {
   res.json({
     success: true,
     data: {

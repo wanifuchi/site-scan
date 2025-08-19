@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { cn } from '../lib/utils';
+import { localHistoryService } from '../services/LocalHistoryService';
 
 const HomePage: React.FC = () => {
   // URLパラメータから初期値を取得
@@ -42,6 +43,17 @@ const HomePage: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
+        // ローカルストレージに分析開始情報を保存
+        localHistoryService.saveAnalysis({
+          id: data.data.id,
+          url: validatedUrl,
+          status: 'processing',
+          startedAt: data.data.startedAt || new Date().toISOString(),
+          analyzedAt: new Date().toISOString()
+        });
+        
+        console.log('📁 分析開始情報をローカルに保存:', data.data.id);
+        
         // 分析結果ページへリダイレクト
         navigate(`/analysis/${data.data.id}`);
       } else {

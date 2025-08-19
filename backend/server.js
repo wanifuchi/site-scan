@@ -26,6 +26,27 @@ const PORT = process.env.PORT || 3002;
 // 分析結果を一時保存（データベース初期化前のフォールバック）
 const analyses = new Map();
 
+// 認証関連
+const crypto = require('crypto');
+const adminTokens = new Set(); // 管理者トークン管理
+
+// 管理者パスワード（環境変数）
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'sitescan_admin_2025';
+
+// 認証ミドルウェア
+function requireAdminAuth(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  
+  if (!token || !adminTokens.has(token)) {
+    return res.status(401).json({
+      success: false,
+      error: '管理者認証が必要です'
+    });
+  }
+  
+  next();
+}
+
 // データベース利用可能かチェック
 let isDatabaseConnected = false;
 
@@ -937,8 +958,47 @@ app.post('/api/analysis/start', async (req, res) => {
   });
 });
 
-// 分析履歴（個別IDルートより前に配置）
-app.get('/api/analysis/history', async (req, res) => {
+// 管理者ログイン
+app.post('/api/auth/admin', express.json(), (req, res) => {
+  try {
+    const { password } = req.body;
+    
+    if (!password || password !== ADMIN_PASSWORD) {
+      return res.status(401).json({
+        success: false,
+        error: 'パスワードが正しくありません'
+      });
+    }
+    
+    // トークン生成
+    const token = crypto.randomBytes(32).toString('hex');
+    adminTokens.add(token);
+    
+    // トークンの有効期限設定（24時間）
+    setTimeout(() => {
+      adminTokens.delete(token);
+    }, 24 * 60 * 60 * 1000);
+    
+    res.json({
+      success: true,
+      data: {
+        token,
+        expiresIn: '24h',
+        message: '管理者として認証されました'
+      }
+    });
+    
+  } catch (error) {
+    console.error('Admin login error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'ログイン処理に失敗しました'
+    });
+  }
+});
+
+// 分析履歴（管理者限定）
+app.get('/api/analysis/history', requireAdminAuth, async (req, res) => {
   try {
     const { page = 1, limit = 20, url = null } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
