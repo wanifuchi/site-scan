@@ -385,7 +385,7 @@ async function generateAIRecommendations(url, analysisResults) {
           
           if (tempContent.title) {
             // メインタイトルの追加
-            const mainTitle = tempContent.title.replace(/[｜|\-\s].*/g, '').trim();
+            const mainTitle = tempContent.title.replace(/[|｜\-\s].*/g, '').trim();
             if (mainTitle && mainTitle.length > 2) keywords.push(mainTitle);
             
             // サイト名を含む完全なタイトル
