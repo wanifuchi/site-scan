@@ -35,7 +35,7 @@ const UsagePage: React.FC = () => {
   const fetchUsageStats = async () => {
     try {
       setLoading(true);
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://website-analyzer-production-c933.up.railway.app';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://site-scan-production.up.railway.app';
       const response = await fetch(`${API_BASE_URL}/api/usage/stats`);
       const data = await response.json();
       

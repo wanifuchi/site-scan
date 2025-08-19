@@ -2,7 +2,7 @@ import axios from 'axios';
 import { AnalysisRequest, Analysis, ApiResponse } from '../types/analysis';
 
 // 環境変数または本番URLを使用
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://website-analyzer-production-c933.up.railway.app';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://site-scan-production.up.railway.app';
 
 // デバッグ用ログ
 console.log('API_BASE_URL:', API_BASE_URL);

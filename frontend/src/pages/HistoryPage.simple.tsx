@@ -26,7 +26,7 @@ const HistoryPageSimple: React.FC = () => {
       
       console.log('履歴取得開始...');
       
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://website-analyzer-production-c933.up.railway.app';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://site-scan-production.up.railway.app';
       console.log('API Base URL:', API_BASE_URL);
       
       const response = await fetch(`${API_BASE_URL}/api/analysis/history?page=1&limit=20`, {
