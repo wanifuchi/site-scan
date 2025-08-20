@@ -203,6 +203,16 @@ const HistoryPageSimple: React.FC = () => {
             </div>
             
             <div className="flex gap-3">
+              {/* 管理者ログイン時のみログアウトボタンを表示 */}
+              {isAdmin && (
+                <button
+                  onClick={logout}
+                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-xl hover:from-red-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-red-500/25 font-medium text-sm"
+                >
+                  ログアウト
+                </button>
+              )}
+              
               <button
                 onClick={handleScreenshot}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-purple-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium"
