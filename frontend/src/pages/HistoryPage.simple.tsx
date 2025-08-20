@@ -16,7 +16,7 @@ const HistoryPageSimple: React.FC = () => {
   const [analyses, setAnalyses] = useState<SimpleAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode] = useState<'local' | 'admin'>('local');
+  const [viewMode, setViewMode] = useState<'local' | 'admin'>('local');
   
   const { authState, logout } = useAuth();
   const { isAdmin, getAuthHeaders } = useAdminAuth();
@@ -24,6 +24,15 @@ const HistoryPageSimple: React.FC = () => {
   useEffect(() => {
     loadHistory();
   }, [viewMode, isAdmin]);
+
+  // 管理者認証状態が変更された時に表示モードを切り替え（UI非表示で内部ロジックのみ）
+  useEffect(() => {
+    if (isAdmin) {
+      setViewMode('admin');
+    } else {
+      setViewMode('local');
+    }
+  }, [isAdmin]);
 
   const loadHistory = async () => {
     try {
