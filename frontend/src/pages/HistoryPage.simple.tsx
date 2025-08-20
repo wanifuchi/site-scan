@@ -16,7 +16,7 @@ const HistoryPageSimple: React.FC = () => {
   const [analyses, setAnalyses] = useState<SimpleAnalysis[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'local' | 'admin'>('local');
+  const [viewMode] = useState<'local' | 'admin'>('local');
   
   const { authState, logout } = useAuth();
   const { isAdmin, getAuthHeaders } = useAdminAuth();
@@ -24,15 +24,6 @@ const HistoryPageSimple: React.FC = () => {
   useEffect(() => {
     loadHistory();
   }, [viewMode, isAdmin]);
-
-  // 管理者認証状態が変更された時に表示モードを切り替え
-  useEffect(() => {
-    if (isAdmin) {
-      setViewMode('admin');
-    } else {
-      setViewMode('local');
-    }
-  }, [isAdmin]);
 
   const loadHistory = async () => {
     try {
@@ -96,11 +87,7 @@ const HistoryPageSimple: React.FC = () => {
         // ローカルモードの場合は空配列
         setAnalyses([]);
       } else {
-        // 管理者モードで認証エラーの場合はローカルモードに切り替え
-        if (err.message?.includes('認証')) {
-          setViewMode('local');
-          return; // loadHistoryが再実行される
-        }
+        // エラーの場合は空配列を設定
         setAnalyses([]);
       }
     } finally {
@@ -200,66 +187,13 @@ const HistoryPageSimple: React.FC = () => {
                 分析履歴
               </h1>
               <div className="flex items-center space-x-4">
-                {/* 表示モード切り替え */}
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-slate-400">表示モード:</span>
-                  <div className="flex bg-slate-800/50 rounded-lg p-1">
-                    <button
-                      onClick={() => setViewMode('local')}
-                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
-                        viewMode === 'local'
-                          ? 'bg-cyan-600 text-white shadow-lg'
-                          : 'text-slate-400 hover:text-slate-300'
-                      }`}
-                    >
-                      📱 ローカル履歴
-                    </button>
-                    <button
-                      onClick={() => isAdmin ? setViewMode('admin') : null}
-                      disabled={!isAdmin}
-                      className={`px-3 py-1 text-xs font-medium rounded-md transition-all duration-200 ${
-                        viewMode === 'admin' && isAdmin
-                          ? 'bg-purple-600 text-white shadow-lg'
-                          : isAdmin 
-                          ? 'text-slate-400 hover:text-slate-300'
-                          : 'text-slate-600 cursor-not-allowed'
-                      }`}
-                      title={!isAdmin ? '管理者ログインが必要です' : ''}
-                    >
-                      🔐 管理者履歴
-                    </button>
-                  </div>
+                  <span className="text-sm text-slate-400">📱 ローカル履歴</span>
                 </div>
-
-                {/* 認証状態表示 */}
-                {isAdmin && (
-                  <div className="flex items-center space-x-2 text-xs">
-                    <span className="px-2 py-1 bg-green-900/30 text-green-400 rounded-md border border-green-500/30">
-                      👑 管理者でログイン中
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
             
             <div className="flex gap-3">
-              {/* 認証関連ボタン */}
-              {isAdmin ? (
-                <button
-                  onClick={logout}
-                  className="bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-xl hover:from-red-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-red-500/25 font-medium text-sm"
-                >
-                  ログアウト
-                </button>
-              ) : (
-                <Link
-                  to="/admin"
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-xl hover:from-purple-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium text-sm"
-                >
-                  管理者ログイン
-                </Link>
-              )}
-              
               <button
                 onClick={handleScreenshot}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-xl hover:from-purple-500 hover:to-pink-500 transition-all duration-300 shadow-lg hover:shadow-purple-500/25 font-medium"
@@ -284,28 +218,10 @@ const HistoryPageSimple: React.FC = () => {
             <div className="flex items-center space-x-2 mb-2">
               <span className="text-red-400">⚠️</span>
               <span className="font-medium">
-                {viewMode === 'admin' ? '管理者履歴取得エラー' : 'ローカル履歴エラー'}
+                ローカル履歴エラー
               </span>
             </div>
             <p className="text-sm">{error}</p>
-            {viewMode === 'admin' && error.includes('認証') && (
-              <div className="mt-3 pt-3 border-t border-red-500/30">
-                <p className="text-xs text-red-200">
-                  認証が切れている可能性があります。
-                  <Link to="/admin" className="text-cyan-400 hover:text-cyan-300 ml-1">
-                    再ログイン
-                  </Link>
-                  するか、
-                  <button 
-                    onClick={() => setViewMode('local')} 
-                    className="text-cyan-400 hover:text-cyan-300 ml-1"
-                  >
-                    ローカル履歴
-                  </button>
-                  をご確認ください。
-                </p>
-              </div>
-            )}
           </div>
         )}
 
@@ -315,13 +231,10 @@ const HistoryPageSimple: React.FC = () => {
               <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">📊</span>
             </div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-slate-200 to-slate-400 bg-clip-text text-transparent mb-3">
-              {viewMode === 'local' ? 'ローカル履歴がありません' : '管理者履歴がありません'}
+              ローカル履歴がありません
             </h2>
             <p className="text-slate-400 mb-8 max-w-md mx-auto leading-relaxed">
-              {viewMode === 'local' 
-                ? 'ブラウザで分析を実行すると、結果がここに保存されます。管理者権限をお持ちの場合は、管理者ログインで全履歴をご確認いただけます。'
-                : 'データベースに保存された分析履歴がありません。新しい分析を開始してください。'
-              }
+              ブラウザで分析を実行すると、結果がここに保存されます。新しい分析を開始してください。
             </p>
             <Link 
               to="/" 
